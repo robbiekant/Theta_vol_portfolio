@@ -1,0 +1,314 @@
+<meta charset="utf-8">
+<title>Theta &amp; Vol Surface Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6F4; --panel:#FFFFFF; --raised:#F0F2EF; --line:#DCE0DA; --line-2:#B9C0B5;
+  --ink:#12171B; --ink-2:#4C565E; --ink-3:#7C8790;
+  --ok:#1E7A57; --warn:#9A6B10; --bad:#B0392C; --na:#8A9299;
+  --accent:#2F6F8F; --accent-soft:rgba(47,111,143,.14);
+  --put:#3E68B0; --call:#C0682B; --front:#12171B; --back:#8A9299;
+  --pos:#1E7A57; --neg:#B0392C;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Public Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --disp:'Archivo','Public Sans',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A0E12; --panel:#111820; --raised:#18212B; --line:#26313D; --line-2:#3A4855;
+    --ink:#E9EFF3; --ink-2:#9EAEBB; --ink-3:#6B7C89;
+    --ok:#46B487; --warn:#D5A23F; --bad:#E0665A; --na:#7B8896;
+    --accent:#5EA8CE; --accent-soft:rgba(94,168,206,.16);
+    --put:#6E93DD; --call:#E0904F; --front:#E9EFF3; --back:#6B7C89;
+    --pos:#46B487; --neg:#E0665A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A0E12; --panel:#111820; --raised:#18212B; --line:#26313D; --line-2:#3A4855;
+  --ink:#E9EFF3; --ink-2:#9EAEBB; --ink-3:#6B7C89;
+  --ok:#46B487; --warn:#D5A23F; --bad:#E0665A; --na:#7B8896;
+  --accent:#5EA8CE; --accent-soft:rgba(94,168,206,.16);
+  --put:#6E93DD; --call:#E0904F; --front:#E9EFF3; --back:#6B7C89;
+  --pos:#46B487; --neg:#E0665A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:14.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1440px;margin:0 auto;padding:0 22px 96px}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:clamp(30px,4.2vw,46px);font-weight:800;line-height:1.02}
+h2{font-size:19px;font-weight:700;letter-spacing:.01em}
+h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+p{margin:0 0 11px;color:var(--ink-2);max-width:74ch}
+a{color:var(--accent)}
+.mono,.n,.ax,td.n,th{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .na{color:var(--na)}
+
+header.top{padding:44px 0 26px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px}
+.stamp{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-top:14px;line-height:1.9}
+.verdict{margin-top:22px;padding:16px 20px;border-radius:4px;background:var(--panel);
+  border:1px solid var(--line);border-left:4px solid var(--bad)}
+.verdict b{font-family:var(--disp);font-size:16px;display:block;margin-bottom:5px}
+
+section{margin:44px 0 0;scroll-margin-top:16px}
+.sechead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:16px}
+.sechead .lede{color:var(--ink-3);font-size:12.5px;font-family:var(--mono)}
+
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));margin:18px 0 4px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 15px}
+.tile .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3)}
+.tile .v{font-family:var(--disp);font-weight:700;font-size:27px;line-height:1.15;margin-top:5px;
+  font-variant-numeric:tabular-nums}
+.tile .s{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.4}
+.tile.hero{border-color:var(--accent);background:var(--accent-soft)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+.tw table{min-width:900px}
+th{text-align:right;padding:7px 8px;border-bottom:1.5px solid var(--ink);color:var(--ink-3);
+  font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:600;white-space:nowrap}
+th:first-child,th.l{text-align:left}
+td{padding:8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--ink-2)}
+td:first-child,td.l,td.det{text-align:left}
+td.det{white-space:normal;font-size:11.5px;color:var(--ink-3);min-width:200px}
+tbody tr:hover td{background:var(--raised)}
+td.sym{color:var(--ink);font-weight:600;font-family:var(--mono)}
+td.sym .cls{display:block;font-family:var(--sans);font-weight:400;font-size:10.5px;
+  color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.sub{display:block;font-size:10.5px;color:var(--ink-3)}
+td.sm{padding:2px 6px}
+svg.smile{width:220px;height:96px;display:block}
+svg.chart{width:100%;height:auto;display:block}
+.ax{font-family:var(--mono);font-size:10.5px;fill:var(--ink-3)}
+.ax.sm{font-size:9.5px}
+.cc{font-family:var(--mono);text-align:center;color:var(--ink);font-size:11px}
+th.rh,td.rh{text-align:left;font-family:var(--mono);color:var(--ink);font-size:11px;
+  background:var(--panel)}
+
+.pill{display:inline-block;padding:2px 8px;border-radius:2px;font-family:var(--mono);
+  font-size:10px;font-weight:600;letter-spacing:.06em;border:1px solid currentColor;white-space:nowrap}
+.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)}
+.pill.bad{color:var(--bad)} .pill.na{color:var(--na)}
+
+details.st{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+  margin-bottom:7px;border-left:3px solid var(--na)}
+details.st.ok{border-left-color:var(--ok)}
+details.st.warn{border-left-color:var(--warn)}
+details.st.bad{border-left-color:var(--bad)}
+details.st summary{cursor:pointer;padding:11px 15px;display:flex;gap:12px;align-items:center;
+  flex-wrap:wrap;list-style:none}
+details.st summary::-webkit-details-marker{display:none}
+details.st summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stsym{font-family:var(--mono);font-weight:600;color:var(--ink);width:46px;flex:none}
+.stname{font-weight:600;min-width:150px}
+.stnote{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex:1;min-width:180px}
+.stnums{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.stbody{padding:4px 15px 16px;border-top:1px solid var(--line)}
+.evgrid{display:grid;gap:9px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin:13px 0 15px}
+.ev{background:var(--raised);border-radius:3px;padding:9px 11px}
+.evk{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3)}
+.evv{display:block;font-family:var(--mono);font-size:16px;font-weight:600;margin-top:2px}
+.evs{display:block;font-size:10.5px;color:var(--ink-3);margin-top:2px;line-height:1.35}
+.gates{display:grid;gap:5px}
+.gate{display:grid;grid-template-columns:84px 132px 1fr;gap:11px;align-items:baseline;
+  font-size:11.5px;padding:4px 0;border-top:1px solid var(--line)}
+.gk{font-weight:600;color:var(--ink)}
+.gd{color:var(--ink-3);font-family:var(--mono);font-size:11px}
+@media(max-width:760px){.gate{grid-template-columns:1fr}}
+
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;
+  color:var(--ink-3);margin-top:10px}
+.legend i{display:inline-block;width:15px;height:3px;vertical-align:middle;margin-right:6px}
+.cols{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.note{background:var(--raised);border-left:3px solid var(--accent);padding:11px 15px;
+  border-radius:0 3px 3px 0;font-size:12.5px;color:var(--ink-2);margin:12px 0}
+.note.crit{border-left-color:var(--bad)}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.85}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Theta · term structure · smile — ETF options desk</div>
+  <h1>What this book can actually earn</h1>
+  <p style="font-size:16px;max-width:70ch">Ten ETFs, priced off the implied forward, screened for the three
+  edges you trade: the front-vs-back <b>theta differential</b>, the <b>volatility level</b> against a
+  realised-vol forecast, and the <b>smile shape</b>. Sized to a $@@nlv@@ book with a hard 2%-of-net-liq
+  daily loss limit.</p>
+  <div class="verdict">
+    <b>No double calendar qualifies today, and the income ceiling is @@calm_pct@@% a month, not 2%.</b>
+    Nine of ten names are in term-structure contango — you would buy the back leg richer than the front you
+    sell. Only GLD has front IV above back IV, and its forward factor is +0.036 against a +0.20 entry rule.
+    Of @@n_struct@@ structures priced from live legs, @@n_pos_ev@@ carry positive expectancy on the calm-regime
+    measure and none do across the full year. The 2% drawdown limit is <i>not</i> the binding constraint:
+    the optimised book uses $@@var_base@@ of a $@@var_cap@@ daily risk budget.
+  </div>
+  <div class="stamp">Snapshot 2026-08-20 · underlying quotes REALTIME from Interactive Brokers ·
+  option legs LIVE-FROZEN (last regular-session two-sided quote) · r = @@r@@% (3m CMT) ·
+  @@panel_days@@ aligned daily returns · portfolio $@@nlv@@</div>
+</header>
+
+<div class="tiles">
+  <div class="tile hero"><div class="k">Achievable monthly income</div>
+    <div class="v">@@calm_pct@@%</div>
+    <div class="s">$@@calm_income@@ on the calm-regime measure. @@all_pct@@% across the full year.</div></div>
+  <div class="tile"><div class="k">Monthly target</div><div class="v">2.00%</div>
+    <div class="s">needs implied vol at @@need@@ today's level</div></div>
+  <div class="tile"><div class="k">99% 1-day VaR</div><div class="v">$@@var_base@@</div>
+    <div class="s">cap $@@var_cap@@ · no-vol-shock $@@var_none@@ · severe $@@var_sev@@</div></div>
+  <div class="tile"><div class="k">CVaR (worst 1%)</div><div class="v">$@@cvar@@</div>
+    <div class="s">mean loss beyond the VaR line</div></div>
+  <div class="tile"><div class="k">Beta-weighted delta</div><div class="v">$@@bwd@@</div>
+    <div class="s">@@bwd_sh@@ SPY-equivalent shares → hedge @@hedge@@</div></div>
+  <div class="tile"><div class="k">Book theta</div><div class="v">$@@theta@@<span style="font-size:14px">/day</span></div>
+    <div class="s">@@npos@@ positions · vega $@@vega@@/vol pt · Sharpe @@sharpe@@</div></div>
+</div>
+
+<section id="screen">
+  <div class="sechead"><h2>1 · Surface screen</h2>
+    <span class="lede">forward from put-call parity · smile re-inverted off that forward · term structure in total variance</span></div>
+  <div class="panel tw">
+  <table>
+  <thead><tr>
+    <th class="l">ETF</th><th class="l">29-day smile</th><th>spot</th><th>fwd 29d</th>
+    <th>ATM 29d</th><th>ATM 57d</th><th>front−back<br><span style="text-transform:none;letter-spacing:0">vol pts</span></th>
+    <th>fwd factor</th><th>RR25<br><span style="text-transform:none;letter-spacing:0">vol pts</span></th>
+    <th>HAR RV</th><th>IV / RV</th><th>exec cost<br><span style="text-transform:none;letter-spacing:0">vol pts</span></th><th class="l">sleeve</th><th>β vs SPY</th>
+  </tr></thead>
+  <tbody>@@rows@@</tbody></table></div>
+  <div class="legend">
+    <span><i style="background:var(--put)"></i>put wing (29d)</span>
+    <span><i style="background:var(--call)"></i>call wing (29d)</span>
+    <span><i style="background:var(--line-2)"></i>57-day smile (dashed)</span>
+    <span>dots = live-quoted strikes · vertical rule = the implied forward</span>
+  </div>
+  <div class="note">Vol points, all of them. <b>front−back</b> is what a calendar earns or pays before
+  anything else happens: positive means the leg you sell is dearer than the leg you buy.
+  <b>RR25</b> is the 25-delta risk reversal — negative is a rich put wing (equities), positive is a rich
+  call wing (metals). <b>exec cost</b> is the ATM straddle's own bid-to-ask expressed in vol points, so it
+  is measured, not assumed.</div>
+</section>
+
+<section id="term">
+  <div class="sechead"><h2>2 · Term structure — the structural problem</h2>
+    <span class="lede">ATM-forward implied vol at 29 and 57 days, and the forward vol between them</span></div>
+  <div class="panel">@@term_svg@@
+  <div class="legend">
+    <span><i style="background:var(--front)"></i>29-day ATM</span>
+    <span><i style="background:var(--back)"></i>57-day ATM</span>
+    <span><i style="background:var(--accent)"></i>forward vol, 29→57 (circle)</span>
+    <span>the number above each pair is front−back in vol points</span>
+  </div></div>
+  <div class="note crit">A calendar wants the leg it sells to be dearer than the leg it buys.
+  Nine of ten names offer the opposite. EWZ is extreme at −9.40 vol points: the Brazilian general election
+  sits inside the October expiry, so the back leg carries an event premium the September leg does not.
+  Selling September to buy October there is paying for someone else's event.</div>
+</section>
+
+<section id="structures">
+  <div class="sechead"><h2>3 · Structure scorecard</h2>
+    <span class="lede">every structure whose legs are all live-quoted in this snapshot · click to open the gates</span></div>
+  @@struct@@
+  <div class="note">Expectancy is measured against each ETF's <b>own historical return distribution</b>,
+  re-centred so E[S<sub>T</sub>] = F — never a lognormal, which has no skew and no fat tail and so cannot
+  price the only risk a short-premium structure actually carries. Overlapping windows are counted honestly:
+  a year of daily data gives ~7 <i>distinct</i> 29-day episodes, so every tail figure here rests on a
+  handful of real events.</div>
+</section>
+
+<section id="book">
+  <div class="sechead"><h2>4 · The book</h2>
+    <span class="lede">maximise expected monthly income s.t. 99% 1-day VaR ≤ $@@var_cap@@, max loss ≤ 2% per trade, one structure per underlying</span></div>
+  <div class="panel tw"><table>
+  <thead><tr><th class="l">ETF</th><th class="l">structure</th><th class="l">ticket</th><th>lots</th>
+  <th>net</th><th>max loss</th><th>delta</th><th>β-wtd Δ</th><th>vega</th><th>θ/day</th><th>expected/mo</th></tr></thead>
+  <tbody>@@book_rows@@</tbody></table></div>
+  <div class="cols" style="margin-top:14px">
+    <div class="panel"><h3>Stress — SPY move through each beta, severe vol shock</h3>
+      <table><thead><tr><th class="l">scenario</th><th>book P&amp;L</th><th>% of net liq</th></tr></thead>
+      <tbody>@@stress_rows@@</tbody></table></div>
+    <div class="panel"><h3>Income frontier — raise the risk budget, nothing happens</h3>
+      <table><thead><tr><th>VaR cap</th><th>income/mo</th><th>% NLV</th><th>realised VaR</th>
+      <th>CVaR</th><th>positions</th><th>max loss</th></tr></thead>
+      <tbody>@@front_rows@@</tbody></table>
+      <div class="note" style="margin-bottom:0">The book saturates well below the risk cap. What limits
+      income is the number of structures with positive expectancy, not the drawdown limit.</div></div>
+  </div>
+</section>
+
+<section id="sweep">
+  <div class="sechead"><h2>5 · Is it a bad regime or a bad idea?</h2>
+    <span class="lede">universe, correlations, forecasts and costs held fixed — only implied vol scales</span></div>
+  <div class="panel">@@sweep_svg@@</div>
+  <div class="panel tw" style="margin-top:12px"><table>
+  <thead><tr><th>IV scale</th><th>income/mo</th><th>% NLV</th><th>99% VaR</th><th>positions</th><th class="l">book</th></tr></thead>
+  <tbody>@@sweep_rows@@</tbody></table></div>
+  <div class="note">The machinery works; today's pricing does not. Holding everything else fixed, the
+  2%-a-month target arrives when implied vol sits at <b>@@need@@</b> today's level — SPY's 29-day ATM at
+  roughly 21% rather than 13.2%, i.e. a VIX in the low twenties. That is a normal, not exotic, volatility
+  regime; it simply is not this one. Read the <i>shape</i> of this curve, not its level: at 1.00x the sweep
+  reprices every leg from the fitted model rather than from the live bid/ask, so it prints @@sweep_base@@%
+  against the live-quote book's @@calm_pct@@%.</div>
+</section>
+
+<section id="corr">
+  <div class="sechead"><h2>6 · Correlation — why ten tickers is not ten bets</h2>
+    <span class="lede">@@panel_days@@ aligned daily returns</span></div>
+  <div class="panel tw"><table>
+  <thead><tr><th class="rh"></th>@@corr_head@@</tr></thead>
+  <tbody>@@corr_rows@@</tbody></table></div>
+  <div class="note">SPY/QQQ 0.93, QQQ/SMH 0.91, KWEB/FXI 0.90, GLD/SLV 0.83. The ten-name universe averages
+  0.50 absolute pairwise correlation — right at the book gate. Book Sharpe over single-trade Sharpe is
+  √(N/(1+(N−1)ρ̄)), which converges to √(1/ρ̄): at ρ̄ = 0.50 the ceiling is 1.41×, and position ten already
+  captures most of it. Adding names inside the US equity block buys nothing.</div>
+</section>
+
+<section id="prov">
+  <div class="sechead"><h2>7 · Provenance</h2><span class="lede">what is live, what is model</span></div>
+  <div class="cols">
+    <div class="panel"><h3>Measured IV bias</h3>
+      <p style="font-size:12.5px">IBKR's surface-level <span class="mono">implied_vol_underlying</span>
+      against the 29-day ATM-forward vol re-inverted from live mids off the fitted forward. Median
+      <b>@@bias_med@@%</b> — the +6.4% understatement carried forward from the 2026-08-20 ETF study does
+      <i>not</i> hold on this snapshot and has been replaced with the measured figure.</p>
+      <table><thead><tr><th class="l">ETF</th><th>surface IV vs re-inverted ATM</th></tr></thead>
+      <tbody>@@bias_rows@@</tbody></table></div>
+    <div class="panel"><h3>Labelled per figure</h3>
+      <p><b>LIVE</b> — every underlying spot, bid/ask, 30-day IV, 30-day HV, IV percentile, dividend yield
+      and daily bar came back <span class="mono">top-status: REALTIME</span> from Interactive Brokers.</p>
+      <p><b>LIVE-FROZEN</b> — all 96 option legs were pulled after the 16:00 ET close; IBKR returned
+      <span class="mono">FROZEN_DELAYED</span>, i.e. the last regular-session two-sided quote and its own
+      midpoint IV. Real quotes, not live ones. Verify before sending an order.</p>
+      <p><b>MODEL</b> — forwards, re-inverted IVs, smile fits, Greeks, expectancy, VaR and the vol-shock
+      channel. Wing IVs outside the quoted strike range are extrapolated flat.</p>
+      <p><b>NOT AVAILABLE</b> — KWEB's October expiry returned no two-sided quote for any leg, so the KWEB
+      calendar is rejected on data grounds rather than scored on a modelled price.</p></div>
+  </div>
+</section>
+
+<footer>
+Generated by <span class="mono">thetavol</span> from the committed snapshot
+<span class="mono">data/snapshots/@@snapshot@@/</span> — <span class="mono">python -m thetavol.cli run</span>
+reproduces every figure on this page offline, with no broker connection.<br>
+Method: Black-76 off a forward fitted per expiration from that expiration's own put-call parity;
+quadratic smile in log-moneyness with flat wing extrapolation; term structure interpolated in total
+variance; HAR / 50-50 / 1-year realised-vol forecasts crossed with mid and execution-adjusted implied vol;
+expectancy against real historical return distributions re-centred to the forward, reported unconditionally
+and on a calm-regime subsample; managed-exit expectancy from a 5-day block bootstrap; 99% 1-day VaR by
+historical simulation across the whole book at once, so cross-asset correlation is the realised one.<br>
+Disclosed limitations: the return sample is one year for nine of ten ETFs (two for SPY), which is a small
+number of distinct episodes and includes one large equity drawdown; the vol-shock channel in the VaR is a
+model, shown at three severities; fills are assumed at mid plus 35% of the half-spread each way.<br>
+<b>Not financial advice.</b> This is analysis tooling. Every figure is an estimate produced from a model
+calibrated to a single point in time, and the market moves.
+</footer>
+</div>
