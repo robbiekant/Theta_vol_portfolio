@@ -1,0 +1,4 @@
+symbol,structure,detail,lots,net_cost_usd,max_loss_usd,delta,beta_wtd_delta_usd,vega,theta_per_day,expected_monthly_usd
+SPY,call credit spread T2,2026-10-16: short 800C / long 810C,6,-851.70,5148.30,-39.49,-30139.86,-131.22,15.43,300.67
+EWZ,put credit spread T2,2026-10-16: short 32P / long 29P,25,-1531.88,5968.13,431.74,14424.68,-50.55,12.29,261.51
+IWM,call credit spread T1,2026-09-18: short 310C / long 320C,6,-621.60,5378.40,-82.27,-29785.32,-84.06,23.38,30.04
