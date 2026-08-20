@@ -1,0 +1,19 @@
+{
+  "as_of_utc": "2026-08-20T21:50:00Z",
+  "as_of_et": "2026-08-20T17:50:00-04:00",
+  "source": "Interactive Brokers MCP get_price_snapshot, SMART routing, top-status=REALTIME on every row",
+  "provenance": "LIVE",
+  "note": "IBKR implied_vol_underlying is a 30d surface-level figure and has been measured to understate true 30d ATM IV; per-expiry ATM IV is re-inverted from live option mids in surface.py and used in preference to this field.",
+  "rows": [
+    {"symbol":"SPY","conid":756733,"exchange":"ARCA","last":763.20,"bid":763.18,"ask":763.20,"iv30":0.12755719497611734,"hv30":0.11542037179493056,"iv_pct_13w":0.2380952388048172,"iv_pct_26w":0.11811023950576782,"iv_pct_52w":0.23904383182525635,"div_yield_pct":0.98,"volume":45414192.538598},
+    {"symbol":"QQQ","conid":320227571,"exchange":"NASDAQ","last":711.06,"bid":711.06,"ask":711.33,"iv30":0.19398809791882668,"hv30":0.2178712706630225,"iv_pct_13w":0.1111111119389534,"iv_pct_26w":0.10236220806837082,"iv_pct_52w":0.41035857796669006,"div_yield_pct":0.42,"volume":33244087.707399,"avg_90d_usd_volume":30561019463},
+    {"symbol":"IWM","conid":9579970,"exchange":"ARCA","last":297.69,"bid":297.67,"ask":297.87,"iv30":0.17743286981185302,"hv30":0.1454390661702694,"iv_pct_13w":0.1746031790971756,"iv_pct_26w":0.08661417663097382,"iv_pct_52w":0.07968127727508545,"div_yield_pct":0.88,"volume":21548429.028646,"avg_90d_usd_volume":7055547420},
+    {"symbol":"GLD","conid":51529211,"exchange":"ARCA","last":414.24,"bid":414.48,"ask":414.73,"iv30":0.2502456771495727,"hv30":0.23154874664070202,"iv_pct_13w":0.9365079402923584,"iv_pct_26w":0.6377952694892883,"iv_pct_52w":0.7211155295372009,"div_yield_pct":0.0,"volume":13834926.572482,"avg_90d_usd_volume":3270606174},
+    {"symbol":"SLV","conid":39039301,"exchange":"ARCA","last":61.65,"bid":61.60,"ask":61.67,"iv30":0.4504237568682901,"hv30":0.3998439292369962,"iv_pct_13w":0.7936508059501648,"iv_pct_26w":0.4015747904777527,"iv_pct_52w":0.4940239191055298,"div_yield_pct":0.0,"volume":24044812.306725,"avg_90d_usd_volume":1106214113},
+    {"symbol":"ARKK","conid":172522644,"exchange":"BATS","last":83.17,"bid":83.00,"ask":83.27,"iv30":0.3443414819981353,"hv30":0.3293007911803432,"iv_pct_13w":0.0793650820851326,"iv_pct_26w":0.03937007859349251,"iv_pct_52w":0.1155378520488739,"div_yield_pct":0.0,"volume":6326994.020739,"avg_90d_usd_volume":511263943},
+    {"symbol":"SMH","conid":229725622,"exchange":"NASDAQ","last":562.82,"bid":562.66,"ask":563.00,"iv30":0.3696816095343866,"hv30":0.5148245771640277,"iv_pct_13w":0.0634920671582222,"iv_pct_26w":0.05511811003088951,"iv_pct_52w":0.4501992166042328,"div_yield_pct":0.21,"volume":6220230.918443,"avg_90d_usd_volume":6397111359},
+    {"symbol":"KWEB","conid":132310537,"exchange":"ARCA","last":26.67,"bid":26.66,"ask":26.76,"iv30":0.2786605659794811,"hv30":0.24090359412636417,"iv_pct_13w":0.1428571492433548,"iv_pct_26w":0.07086614519357681,"iv_pct_52w":0.1434262990951538,"div_yield_pct":7.7,"volume":48644694.663279,"avg_90d_usd_volume":577365098},
+    {"symbol":"FXI","conid":31421120,"exchange":"ARCA","last":35.66,"bid":35.61,"ask":35.76,"iv30":0.189398309810788,"hv30":0.17811356571165488,"iv_pct_13w":0.0476190485060215,"iv_pct_26w":0.023622047156095505,"iv_pct_52w":0.07968127727508545,"div_yield_pct":1.9,"volume":32036433.134118,"avg_90d_usd_volume":864564442},
+    {"symbol":"EWZ","conid":10753244,"exchange":"ARCA","last":34.02,"bid":33.91,"ask":34.42,"iv30":0.25665992099452856,"hv30":0.1966740403090352,"iv_pct_13w":0.190476194024086,"iv_pct_26w":0.09448818862438202,"iv_pct_52w":0.39840638637542725,"div_yield_pct":4.27,"volume":25361717.954396,"avg_90d_usd_volume":703721161}
+  ]
+}
