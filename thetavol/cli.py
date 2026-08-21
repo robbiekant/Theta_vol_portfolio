@@ -6,7 +6,8 @@ verbs:
   portfolio   run the optimiser and print the book under all three EV measures
   sweep       VRP regime sweep: what implied-vol level the 2%/month target needs
   dashboard   regenerate the HTML task board into out/
-  run         everything, then write out/*.csv and the dashboard
+  export      re-derive the three flat IBKR CSVs (the Drive mirror) from the snapshot
+  run         everything, then write out/*.csv, the Drive CSVs and the dashboard
 """
 from __future__ import annotations
 import sys, json
@@ -59,6 +60,9 @@ def main(argv=None):
             print(f"  IV x{row['k']:.2f}  income ${row['income']:7,.0f}/mo "
                   f"({row['income_pct']*100:5.2f}%)  VaR ${row['var']:6,.0f}  "
                   f"{row['n_pos']} positions")
+    if verb in ("export", "run"):
+        for p in report.export_ibkr_csvs():
+            print(f"export -> {p}")
     if verb in ("dashboard", "run"):
         from . import dashboard
         p = dashboard.render(res)

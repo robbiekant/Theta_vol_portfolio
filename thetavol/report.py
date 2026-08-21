@@ -72,7 +72,7 @@ def build(snapshot: str = SNAPSHOT, sweep: bool = True) -> dict:
 def _write_csv(res: dict) -> None:
     r = res["screen"]
     with open(os.path.join(OUT, "etf_vol_screen.csv"), "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["symbol", "asset_class", "spot", "fwd_29d", "fwd_57d", "atm_iv_29d",
                     "atm_iv_57d", "iv_bid_29d", "iv_ask_29d", "exec_cost_volpts",
                     "horizontal_skew_volpts", "forward_vol_29_57", "forward_factor",
@@ -96,7 +96,7 @@ def _write_csv(res: dict) -> None:
                         rec["side"], f"{res['betas'][sym]:.4f}"])
 
     with open(os.path.join(OUT, "structure_scorecard.csv"), "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["symbol", "structure", "detail", "front_dte", "net_cost_usd",
                     "max_loss_usd", "delta", "gamma", "vega", "theta",
                     "ev_hold_all", "ev_hold_calm", "ev_managed", "managed_win",
@@ -123,7 +123,7 @@ def _write_csv(res: dict) -> None:
 
     for key, bkd in res["books"].items():
         with open(os.path.join(OUT, f"portfolio_{key}.csv"), "w", newline="") as f:
-            w = csv.writer(f)
+            w = csv.writer(f, lineterminator="\n")
             w.writerow(["symbol", "structure", "detail", "lots", "net_cost_usd",
                         "max_loss_usd", "delta", "beta_wtd_delta_usd", "vega",
                         "theta_per_day", "expected_monthly_usd"])
@@ -135,3 +135,53 @@ def _write_csv(res: dict) -> None:
                             f"{g['delta']*n:.2f}", f"{bw:.2f}", f"{g['vega']*n:.2f}",
                             f"{g['theta']*n:.2f}",
                             f"{pf.expected_monthly(st, key)*n:.2f}"])
+
+
+# ---------------------------------------------------------------- Drive export
+def export_ibkr_csvs() -> list:
+    """Re-derive the three flat IBKR CSVs (the ones mirrored to Google Drive)
+    straight from the committed JSON snapshot, so they are reproducible rather
+    than hand-made artifacts."""
+    import csv
+    snap = os.path.join(surface.DATA, SNAPSHOT)
+    out = []
+
+    with open(os.path.join(snap, "underlyings.json"), encoding="utf-8") as f:
+        u = json.load(f)
+    p = os.path.join(OUT, f"ibkr_underlyings_{SNAPSHOT}.csv")
+    cols = ["symbol", "conid", "exchange", "last", "bid", "ask", "iv30", "hv30",
+            "iv_pct_13w", "iv_pct_26w", "iv_pct_52w", "div_yield_pct", "volume"]
+    with open(p, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(cols + ["provenance"])
+        for r in u["rows"]:
+            w.writerow([r[c] for c in cols] + [u["provenance"]])
+    out.append(p)
+
+    with open(os.path.join(snap, "chains.json"), encoding="utf-8") as f:
+        c = json.load(f)
+    p = os.path.join(OUT, f"ibkr_option_chain_{SNAPSHOT}.csv")
+    with open(p, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["symbol", "expiry", "dte", "strike", "type", "bid", "ask", "mid",
+                    "ibkr_midpoint_iv", "open_interest", "provenance"])
+        for r in c["rows"]:
+            e = c["expiries"][r["exp"]]
+            w.writerow([r["sym"], e["date"], e["dte"], r["K"], r["cp"], r["bid"], r["ask"],
+                        round((r["bid"] + r["ask"]) / 2, 6), round(r["iv"], 6), r["oi"],
+                        c["provenance"]])
+    out.append(p)
+
+    series = {}
+    for sym in UNIVERSE:
+        with open(os.path.join(snap, f"px_{sym}.json"), encoding="utf-8") as f:
+            series[sym] = json.load(f)["close"]
+    n = min(len(v) for v in series.values())          # align on the shortest history
+    p = os.path.join(OUT, f"ibkr_daily_closes_{SNAPSHOT}.csv")
+    with open(p, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["session_index_from_2025_08_21"] + list(UNIVERSE))
+        for i in range(n):
+            w.writerow([i + 1] + [series[s][len(series[s]) - n + i] for s in UNIVERSE])
+    out.append(p)
+    return out
